@@ -1,6 +1,8 @@
 import React from 'react';
 import { CssBaseline, Container, ThemeProvider, createTheme } from '@mui/material';
-import { FormTemplateList } from './components/FormTemplateList';
+import FormTemplateList from './components/FormTemplateList';
+import { BrowserRouter as Router } from 'react-router-dom';
+import Navigation from './components/Navigation';
 
 const theme = createTheme({
   palette: {
@@ -13,12 +15,15 @@ const theme = createTheme({
 
 const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container maxWidth="xl" sx={{ mt: 4 }}>
-        <FormTemplateList />
-      </Container>
-    </ThemeProvider>
+    <Router>
+      <Navigation isLoggedIn={false} />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Container maxWidth="xl" sx={{ mt: 4 }}>
+          <FormTemplateList />
+        </Container>
+      </ThemeProvider>
+    </Router>
   );
 };
 

@@ -1,0 +1,205 @@
+[
+  {
+    "id": 1,
+    "templateNo": "545454",
+    "name": "Template 1",
+    "revision": "1",
+    "createdBy": "N/A",
+    "department": "N/A",
+    "reference": "N/A",
+    "fields": "2 fields",
+    "createdAt": "Feb 3, 2025 05:51",
+    "attachments": [
+      {
+        "originalName": "freeze rinfg.webp",
+        "storedName": "1738990478542-freeze rinfg.webp",
+        "size": 99360,
+        "url": "http://localhost:5000/uploads/1738990478542-freeze rinfg.webp"
+      },
+      {
+        "originalName": "UHA-season talents.webp",
+        "storedName": "1738990478542-UHA-season talents.webp",
+        "size": 49866,
+        "url": "http://localhost:5000/uploads/1738990478542-UHA-season talents.webp"
+      },
+      {
+        "originalName": "kvk-alliances.png",
+        "storedName": "1738991978360-kvk-alliances.png",
+        "size": 2402758,
+        "url": "http://localhost:5000/uploads/1738991978360-kvk-alliances.png"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "templateNo": "8",
+    "name": "Template 2",
+    "revision": "1",
+    "createdBy": "N/A",
+    "department": "N/A",
+    "reference": "N/A",
+    "fields": "2 fields5",
+    "createdAt": "Feb 3, 2025 05:54",
+    "attachments": [
+      {
+        "originalName": "2025-02-05 06_58_44-dragdrop-creator-a4.png",
+        "storedName": "1738990739119-2025-02-05 06_58_44-dragdrop-creator-a4.png",
+        "size": 6664,
+        "url": "http://localhost:5000/uploads/1738990739119-2025-02-05 06_58_44-dragdrop-creator-a4.png"
+      },
+      {
+        "originalName": "2025-02-01 08_26_36-Solitaire & Casual Games.png",
+        "storedName": "1738990739119-2025-02-01 08_26_36-Solitaire & Casual Games.png",
+        "size": 2270056,
+        "url": "http://localhost:5000/uploads/1738990739119-2025-02-01 08_26_36-Solitaire & Casual Games.png"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "templateNo": "",
+    "name": "New Template",
+    "revision": "1",
+    "createdBy": "55",
+    "department": "",
+    "reference": "",
+    "fields": "0 fields",
+    "createdAt": "2/8/2025, 6:38:28 AM",
+    "attachments": [
+      {
+        "originalName": "2024-05-31 12_58_45-Greenshot.png",
+        "storedName": "1738993144246-2024-05-31 12_58_45-Greenshot.png",
+        "size": 1267437,
+        "url": "http://localhost:5000/uploads/1738993144246-2024-05-31 12_58_45-Greenshot.png"
+      },
+      {
+        "originalName": "photo_2023-05-16_16-34-20.jpg",
+        "storedName": "1738993492667-photo_2023-05-16_16-34-20.jpg",
+        "size": 27500,
+        "url": "http://localhost:5000/uploads/1738993492667-photo_2023-05-16_16-34-20.jpg"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "templateNo": "",
+    "name": "New Template",
+    "revision": "1",
+    "createdBy": "Admin",
+    "department": "",
+    "reference": "",
+    "fields": "0 fields",
+    "createdAt": "2/8/2025, 6:38:29 AM",
+    "attachments": [
+      {
+        "originalName": "photo_2023-05-16_16-34-20.jpg",
+        "storedName": "1738994648619-photo_2023-05-16_16-34-20.jpg",
+        "size": 27500,
+        "url": "http://localhost:5000/uploads/1738994648619-photo_2023-05-16_16-34-20.jpg"
+      },
+      {
+        "storedName": "1738995032046-kvk-alliances.png",
+        "originalName": "kvk-alliances.png",
+        "size": 2402758,
+        "url": "http://localhost:5000/uploads/1738995032046-kvk-alliances.png"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "templateNo": "",
+    "name": "New Template",
+    "revision": "1",
+    "createdBy": "Admin",
+    "department": "",
+    "reference": "",
+    "fields": "0 fields",
+    "createdAt": "2/8/2025, 6:38:33 AM",
+    "attachments": [
+      {
+        "storedName": "1738994984766-ua-photo3.png",
+        "originalName": "ua-photo3.png",
+        "size": 1983779,
+        "url": "http://localhost:5000/uploads/1738994984766-ua-photo3.png"
+      },
+      {
+        "storedName": "1738994984766-ua-photo.png",
+        "originalName": "ua-photo.png",
+        "size": 17878,
+        "url": "http://localhost:5000/uploads/1738994984766-ua-photo.png"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "templateNo": "",
+    "name": "New Template",
+    "revision": "1",
+    "createdBy": "Admin",
+    "department": "",
+    "reference": "",
+    "fields": "0 fields",
+    "createdAt": "2/8/2025, 6:38:37 AM",
+    "attachments": []
+  },
+  {
+    "id": 7,
+    "templateNo": "",
+    "name": "New Template",
+    "revision": "1",
+    "createdBy": "Admin",
+    "department": "",
+    "reference": "",
+    "fields": "0 fields",
+    "createdAt": "2/8/2025, 6:39:43 AM",
+    "attachments": []
+  },
+  {
+    "id": 8,
+    "templateNo": "",
+    "name": "New Template",
+    "revision": "1",
+    "createdBy": "Admin",
+    "department": "",
+    "reference": "",
+    "fields": "0 fields",
+    "createdAt": "2/8/2025, 6:39:44 AM",
+    "attachments": []
+  },
+  {
+    "id": 9,
+    "templateNo": "",
+    "name": "New Template",
+    "revision": "1",
+    "createdBy": "Admin",
+    "department": "",
+    "reference": "",
+    "fields": "0 fields",
+    "createdAt": "2/8/2025, 6:39:44 AM",
+    "attachments": []
+  },
+  {
+    "id": 10,
+    "templateNo": "",
+    "name": "New Template",
+    "revision": "1",
+    "createdBy": "Admin",
+    "department": "",
+    "reference": "",
+    "fields": "0 fields",
+    "createdAt": "2/8/2025, 6:39:44 AM",
+    "attachments": []
+  },
+  {
+    "id": 11,
+    "templateNo": "",
+    "name": "New Template",
+    "revision": "1",
+    "createdBy": "Admin",
+    "department": "",
+    "reference": "",
+    "fields": "0 fields",
+    "createdAt": "2/8/2025, 6:39:50 AM",
+    "attachments": []
+  }
+]

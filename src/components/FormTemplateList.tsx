@@ -1,23 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Paper,
   Typography,
   Box,
-  Button
 } from '@mui/material';
-import { 
-  DataGrid, 
-  GridColDef, 
-  GridToolbar,
-  GridFilterModel,
-  getGridStringOperators,
-} from '@mui/x-data-grid';
-import { Visibility, Edit, Delete } from '@mui/icons-material';
-import IconButton from '@mui/material/IconButton';
-import FileUploadCell from './FileUploadCell';
-import FileUploadModal from './FileUploadModal';
+import { useNavigate } from 'react-router-dom';
 
-interface FormTemplate {
+import FileUploadCell from './FileUploadCell';
+import axios from 'axios';
+import { DataTable, DataTableValueArray, DataTableValue } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { InputText } from 'primereact/inputtext';
+import { Paginator } from 'primereact/paginator';
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+import { Button } from 'primereact/button';
+import { MultiSelect } from 'primereact/multiselect';
+import type { ColumnEditorOptions } from 'primereact/column';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import FileLinks from './FileLinks';
+import { Toast } from 'primereact/toast';
+
+export interface FileData {
+  storedName: string;
+  originalName: string;
+  size: number;
+  url: string;
+}
+
+export interface FormTemplate extends DataTableValue {
   id: number;
   templateNo: string;
   name: string;
@@ -27,7 +40,12 @@ interface FormTemplate {
   reference: string;
   fields: string;
   createdAt: string;
-  attachment: string;
+  attachments: Array<{
+    storedName: string;
+    originalName: string;
+    size: number;
+    url: string;
+  }>;
 }
 
 const mockData: FormTemplate[] = [
@@ -41,7 +59,7 @@ const mockData: FormTemplate[] = [
     reference: 'N/A',
     fields: '2 fields',
     createdAt: 'Feb 3, 2025 05:51',
-    attachment: ''
+    attachments: []
   },
   {
     id: 2,
@@ -53,7 +71,7 @@ const mockData: FormTemplate[] = [
     reference: 'N/A',
     fields: '2 fields',
     createdAt: 'Feb 3, 2025 05:54',
-    attachment: ''
+    attachments: []
   },
   {
     id: 3,
@@ -65,193 +83,292 @@ const mockData: FormTemplate[] = [
     reference: '09',
     fields: '2 fields',
     createdAt: 'Feb 3, 2025 05:58',
-    attachment: ''
+    attachments: []
   }
 ];
 
-const customStringOperators = getGridStringOperators().map((operator) => ({
-  ...operator,
-  InputComponent: operator.InputComponent,
-}));
-
-export const FormTemplateList: React.FC = () => {
-  const [rows, setRows] = useState<FormTemplate[]>(mockData);
-  const [filterModel, setFilterModel] = useState<GridFilterModel>({
-    items: [],
-    quickFilterValues: [],
+const FormTemplateList: React.FC = () => {
+  const [rows, setRows] = useState<FormTemplate[]>([]);
+  const [globalFilter, setGlobalFilter] = useState<string>('');
+  const [filters, setFilters] = useState<any>({
+    templateNo: { value: '', matchMode: 'contains' },
+    name: { value: '', matchMode: 'contains' },
+    revision: { value: '', matchMode: 'contains' },
+    createdBy: { value: '', matchMode: 'contains' },
+    department: { value: '', matchMode: 'contains' },
+    reference: { value: '', matchMode: 'contains' },
+    fields: { value: '', matchMode: 'contains' },
+    createdAt: { value: '', matchMode: 'contains' },
+    'attachments.length': { value: '', matchMode: 'equals' }
   });
+  const [nextId, setNextId] = useState<number>(Math.max(...mockData.map(r => r.id)) + 1);
+  const dt = useRef<DataTable<DataTableValueArray>>(null);
+  const [first, setFirst] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const navigate = useNavigate();
+  const toast = useRef<Toast>(null);
 
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const handleFileUpload = (id: number) => (file: File) => {
-    setRows(prevRows => 
-      prevRows.map(row => 
-        row.id === id 
-          ? { ...row, attachment: file.name }
-          : row
-      )
-    );
-  };
-
-  const handleOpenModal = () => {
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-  };
-
-  const columns: GridColDef[] = [
+  // Revert columns configuration
+  const columns = [
+    { field: 'templateNo', header: 'Template No.' },
+    { field: 'name', header: 'Name' },
+    { field: 'revision', header: 'Revision' },
+    { field: 'createdBy', header: 'Created By' },
+    { field: 'department', header: 'Department' },
+    { field: 'reference', header: 'Reference' },
+    { field: 'fields', header: 'Fields' },
+    { field: 'createdAt', header: 'Created At' },
     { 
-      field: 'id', 
-      headerName: '#', 
-      width: 70,
-      filterable: true,
-      filterOperators: customStringOperators,
-    },
-    {
-      field: 'templateNo',
-      headerName: 'Template No.',
-      width: 130,
-      filterable: true,
-      filterOperators: customStringOperators,
-    },
-    {
-      field: 'name',
-      headerName: 'Name',
-      width: 130,
-      filterable: true,
-      filterOperators: customStringOperators,
-    },
-    {
-      field: 'revision',
-      headerName: 'Revision',
-      width: 100,
-      filterable: true,
-      filterOperators: customStringOperators,
-    },
-    {
-      field: 'createdBy',
-      headerName: 'Created By',
-      width: 130,
-      filterable: true,
-      filterOperators: customStringOperators,
-    },
-    {
-      field: 'department',
-      headerName: 'Department',
-      width: 130,
-      filterable: true,
-      filterOperators: customStringOperators,
-    },
-    {
-      field: 'reference',
-      headerName: 'Reference',
-      width: 130,
-      filterable: true,
-      filterOperators: customStringOperators,
-    },
-    {
-      field: 'fields',
-      headerName: 'Fields',
-      width: 100,
-      filterable: true,
-      filterOperators: customStringOperators,
-    },
-    {
-      field: 'createdAt',
-      headerName: 'Created At',
-      width: 160,
-      filterable: true,
-      filterOperators: customStringOperators,
-    },
-    {
-      field: 'attachment',
-      headerName: 'Attachment',
-      width: 150,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => (
+      field: 'attachments', 
+      header: 'Files',
+      body: (rowData: FormTemplate) => (
         <FileUploadCell
-          value={params.value}
-          onFileUpload={handleFileUpload(params.row.id)}
+          value={rowData.attachments}
+          onUpload={(files) => handleUpload(rowData.id, files)}
+          onRemove={(file) => handleRemove(rowData.id, file)}
+          templateId={rowData.id}
         />
-      ),
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 150,
-      sortable: false,
-      filterable: false,
-      renderCell: () => (
-        <Box>
-          <IconButton size="small" sx={{ mr: 1 }}>
-            <Visibility />
-          </IconButton>
-          <IconButton size="small" sx={{ mr: 1 }}>
-            <Edit />
-          </IconButton>
-          <IconButton size="small">
-            <Delete />
-          </IconButton>
-        </Box>
-      ),
-    },
+      )
+    }
   ];
+
+  // Now initialize state with columns
+  const [selectedColumns, setSelectedColumns] = useState<any[]>(columns);
+
+  // Update column options for selection
+  const columnOptions = columns.filter(col => col.field !== 'actions');
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/templates');
+        // Filter out any null or invalid entries from the API response
+        const validData = response.data.filter((item: FormTemplate) => item.id !== null);
+        setRows(validData);
+        
+        // Update nextId based on actual API data
+        if (validData.length > 0) {
+          const maxId = Math.max(...validData.map((r: FormTemplate) => r.id));
+          setNextId(maxId + 1);
+        }
+      } catch (error) {
+        console.error('Error fetching templates:', error);
+        // Only use mock data if there's no existing data
+        if (rows.length === 0) {
+          setRows(mockData.filter(item => item.id !== null));
+        }
+      }
+    };
+    fetchTemplates();
+  }, []);
+
+  const updateBackend = async (updatedRows: FormTemplate[]) => {
+    try {
+      await axios.put('http://localhost:5000/api/templates', updatedRows);
+    } catch (error) {
+      console.error('Error saving templates:', error);
+    }
+  };
+
+  const handleUpload = (id: number, newFiles: FileData[]) => {
+    const updatedRows = rows.map(template => 
+      template.id === id
+        ? { ...template, attachments: [...template.attachments, ...newFiles] }
+        : template
+    );
+    
+    setRows(updatedRows);
+    updateBackend(updatedRows);
+    
+    // Show toast notification
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Upload Successful',
+      detail: `${newFiles.length} file(s) uploaded`,
+      life: 3000
+    });
+  };
+
+  const handleRemove = (templateId: number, fileToRemove: FileData) => {
+    const updatedRows = rows.map(template => 
+      template.id === templateId
+        ? { 
+            ...template, 
+            attachments: template.attachments.filter(file => 
+              file.storedName !== fileToRemove.storedName
+            )
+          }
+          : template
+    );
+    
+    setRows(updatedRows);
+    updateBackend(updatedRows);
+  };
+
+  const onRowEditComplete = async (e: any) => {
+    const { newData } = e;
+    
+    // Create new array with updated row
+    const updatedRows = rows.map(row => 
+      row.id === newData.id ? { ...row, ...newData } : row
+    );
+
+    try {
+      // Update backend first
+      await axios.put('http://localhost:5000/api/templates', updatedRows);
+      // Then update local state
+      setRows(prev => prev.map(row => 
+        row.id === newData.id ? { ...row, ...newData } : row
+      ));
+    } catch (error) {
+      console.error('Error saving template:', error);
+    }
+  };
+
+  const exportCSV = () => {
+    dt.current?.exportCSV({
+        selectionOnly: false,
+        // Add custom data processing
+        exportFunction: (data: any) => {
+            const processedData = data.map((row: FormTemplate) => ({
+                ...row,
+                // Format attachments for CSV
+                attachments: row.attachments
+                    .map(file => `=HYPERLINK("${file.url}", "${file.originalName}")`)
+                    .join(', ')
+            }));
+            
+            return {
+                data: processedData,
+                fields: selectedColumns.map(col => col.field)
+            };
+        }
+    });
+  };
+
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    
+    const visibleColumns = selectedColumns.length > 0 ? selectedColumns : columns;
+    
+    const headers = visibleColumns.map(col => col.header);
+    const data = rows.map(row => visibleColumns.map(col => 
+      col.field === 'attachments.length' ? 
+      row.attachments.length.toString() : 
+      row[col.field as keyof FormTemplate]?.toString() || ''
+    ));
+  
+    (doc as any).autoTable({
+      head: [headers],
+      body: data,
+      styles: { fontSize: 8 },
+      theme: 'grid'
+    });
+   
+    doc.save('form-templates.pdf');
+  };
+
+  useEffect(() => {
+    if (rows.length > 0) {
+      const maxId = Math.max(...rows.map((r: FormTemplate) => r.id));
+      setNextId(maxId + 1);
+    }
+  }, [rows]);
 
   return (
     <Paper sx={{ width: '100%', mb: 2, p: 2 }}>
-      <Typography
-        sx={{ flex: '1 1 100%', mb: 2 }}
-        variant="h6"
-        component="div"
-      >
-        Form Templates
-      </Typography>
-      <Button variant="contained" onClick={handleOpenModal}>Upload Files</Button>
-      <FileUploadModal open={modalOpen} onClose={handleCloseModal} onFilesChange={() => {}} />
-      <Box sx={{ height: 600, width: '100%' }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          filterModel={filterModel}
-          onFilterModelChange={(newModel) => setFilterModel(newModel)}
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
-            },
-            filter: {
-              filterModel: {
-                items: [],
-                quickFilterValues: [],
-              },
-            },
-          }}
-          pageSizeOptions={[5, 10, 25]}
-          slots={{ toolbar: GridToolbar }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-              quickFilterProps: { debounceMs: 500 },
-            },
-          }}
-          filterMode="client"
-          disableColumnSelector={false}
-          disableDensitySelector={false}
-          disableColumnFilter={false}
-          disableColumnMenu={false}
-          density="standard"
-          sx={{
-            '& .MuiDataGrid-columnHeader': {
-              backgroundColor: '#f5f5f5',
-            },
-            '& .MuiDataGrid-cell:hover': {
-              color: 'primary.main',
-            },
-          }}
-        />
+      <Toast ref={toast} position="top-right" />
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6" component="div">
+          Form Templates
+        </Typography>
+        <div className="flex gap-3">
+          <Button
+            label="CSV"
+            icon="pi pi-file-excel"
+            className="p-button-help"
+            onClick={exportCSV}
+          />
+          <Button
+            label="PDF"
+            icon="pi pi-file-pdf"
+            className="p-button-danger"
+            onClick={exportPDF}
+          />
+          <Button
+            label="Add New"
+            icon="pi pi-plus"
+            className="p-button-success"
+            onClick={() => navigate('/templates/new')}
+          />
+          <MultiSelect
+            value={selectedColumns}
+            options={columnOptions}
+            optionLabel="header"
+            placeholder="Select Columns"
+            className="w-48"
+            onChange={(e) => setSelectedColumns(e.value)}
+          />
+          <InputText
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Global Search"
+            className="p-inputtext-sm"
+          />
+        </div>
       </Box>
+      <div className="card">
+        <DataTable
+          ref={dt}
+          value={rows}
+          paginator
+          rows={rowsPerPage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          tableStyle={{ minWidth: '60rem' }}
+          className="p-datatable-responsive"
+          filterDisplay="menu"
+          globalFilter={globalFilter}
+          filters={filters}
+          onFilter={(e) => setFilters(e.filters)}
+          editMode="row"
+          dataKey="id"
+          onRowEditComplete={onRowEditComplete}
+          first={first}
+          onPage={(e) => {
+            setFirst(e.first);
+            setRowsPerPage(e.rows);
+          }}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          currentPageReportTemplate="{first} to {last} of {totalRecords}"
+        >
+          {columns.map((col) => (
+            <Column
+              key={col.field}
+              field={col.field}
+              header={col.header}
+              body={col.body}
+              style={col.field === 'id' ? { width: '70px' } : { width: '130px' }}
+              sortable={col.field !== 'id'}
+              filter={col.field !== 'id'}
+              editor={col.field !== 'attachments' ? (options: ColumnEditorOptions) => {
+                const isNumeric = ['id'].includes(col.field);
+                return (
+                  <InputText
+                    value={options.rowData[col.field]}
+                    onChange={(e) => {
+                      const value = isNumeric ? Number(e.target.value) : e.target.value;
+                      (options.editorCallback as (value: any) => void)(value);
+                    }}
+                  />
+                );
+              } : undefined}
+            />
+          ))}
+          <Column rowEditor headerStyle={{ width: '10%' }} />
+        </DataTable>
+      </div>
     </Paper>
   );
 };
+
+export default FormTemplateList;

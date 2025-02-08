@@ -1,0 +1,4 @@
+npm uninstall jspdf @types/jspdf jspdf-autotable
+npm install jspdf@2.5.1 jspdf-autotable@3.8.2 --force
+npm install @types/jspdf-autotable --save-dev
+npm install react-router-dom @types/react-router-dom 
